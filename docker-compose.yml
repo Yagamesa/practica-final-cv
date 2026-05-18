@@ -1,0 +1,56 @@
+services:
+
+  database:
+    image: mysql:8.0
+    container_name: mysql_cv
+
+    restart: always
+
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+
+    ports:
+      - "3306:3306"
+
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+    networks:
+      - cv_network
+
+  backend:
+    image: yagamesa123/eguez-backend:v1
+
+    container_name: backend_cv
+
+    restart: always
+
+    depends_on:
+      - database
+
+    ports:
+      - "4000:4000"
+
+    networks:
+      - cv_network
+
+  frontend:
+    image: yagamesa123/eguez-frontend:v1
+
+    container_name: frontend_cv
+
+    depends_on:
+      - backend
+
+    ports:
+      - "3000:3000"
+
+    networks:
+      - cv_network
+
+volumes:
+  mysql_data:
+
+networks:
+  cv_network:
